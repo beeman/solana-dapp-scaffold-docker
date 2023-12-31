@@ -1,24 +1,28 @@
 # The base image
 FROM node:20-alpine as base
 
-RUN corepack enable && corepack prepare pnpm@8.12.1 --activate
+# Set the working directory
+WORKDIR /app
 
 # The build image
 FROM base as build
 
-WORKDIR /scratch
+# Install corepack and pnpm
+RUN corepack enable && corepack prepare pnpm@8.12.1 --activate
 
-COPY package.json pnpm-lock.yaml /scratch/
+# Copy the package files
+COPY package.json pnpm-lock.yaml /app/
 
+# Install the dependencies
 RUN pnpm install --no-frozen-lockfile
 
-COPY anchor /scratch/anchor
-COPY web /scratch/web
-COPY tsconfig.base.json /scratch/
+# Copy the source files
+COPY anchor /app/anchor
+COPY web /app/web
+COPY tsconfig.base.json /app/
 
+# Build the source files
 RUN pnpm nx build web --skip-nx-cache
-
-RUN find /scratch/dist/web
 
 # The production image
 FROM base as production
@@ -26,10 +30,11 @@ FROM base as production
 # Install the 'serve' package to serve the static content
 RUN npm install -g serve
 
-WORKDIR /app
+# Copy the static content from the build image
+COPY --from=build /app/dist/web /app/
 
-COPY --from=build /scratch/dist/web /app/
-
+# Expose the port
 EXPOSE 80
 
+# Start the server
 CMD ["serve", "-s", ".", "-l", "80"]
