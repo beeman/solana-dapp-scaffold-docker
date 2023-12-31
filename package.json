@@ -8,6 +8,8 @@
     "anchor-localnet": "nx run anchor:anchor localnet",
     "anchor-test": "nx run anchor:anchor test",
     "build": "nx build web",
+    "docker:build": "docker build . -t solana-dapp-scaffold-docker",
+    "docker:run": "docker run -it --init -p 9876:9876 --rm  solana-dapp-scaffold-docker",
     "dev": "nx serve web"
   },
   "private": true,
