@@ -30,6 +30,6 @@ WORKDIR /app
 
 COPY --from=build /scratch/dist/web /app/
 
-EXPOSE 9876
+EXPOSE 80
 
-CMD ["serve", "-s", ".", "-l", "9876"]
+CMD ["serve", "-s", ".", "-l", "80"]
